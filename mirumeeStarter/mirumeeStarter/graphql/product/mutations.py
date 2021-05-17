@@ -18,7 +18,6 @@ class ProductCreate(graphene.Mutation):
 
     @classmethod
     def clean_input(self, input):
-        input.update({'price': str(input.get('price'))})
         return input
 
     @classmethod
@@ -43,7 +42,6 @@ class ProductVariantCreate(graphene.Mutation):
 
     @classmethod
     def clean_input(self, input):
-        input.update({'price': str(input.get('price'))})
         return input
 
     @classmethod
