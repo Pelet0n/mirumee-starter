@@ -25,6 +25,6 @@ class ProductQueries(graphene.ObjectType):
 
 class ProductMutations(graphene.ObjectType):
     product_create = ProductCreate.Field()
-    productVariant_create = ProductVariantCreate.Field()
+    product_variant_create = ProductVariantCreate.Field()
 
     
