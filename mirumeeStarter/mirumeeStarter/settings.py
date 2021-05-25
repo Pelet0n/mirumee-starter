@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'graphene_django',
 
     'mirumeeStarter.product',
+    'mirumeeStarter.checkout',
+    
 ]
 
 MIDDLEWARE = [
