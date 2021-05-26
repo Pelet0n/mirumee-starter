@@ -1,5 +1,6 @@
 
 
+from tabnanny import check
 import graphene
 from .types import CheckoutType, CheckoutLineType
 from ...checkout.models import Checkout, CheckoutLine
@@ -17,7 +18,6 @@ class CheckoutCreateInput(graphene.InputObjectType):
 class CheckoutCreate(graphene.Mutation):
     checkout = graphene.Field(CheckoutType)
     checkout_line = graphene.Field(CheckoutLineType)
-    
 
     class Arguments:
         input = CheckoutCreateInput(required=True)
@@ -30,7 +30,11 @@ class CheckoutCreate(graphene.Mutation):
     @classmethod
     def mutate(cls, root, info, input):
         cleaned_input = cls.clean_input(input)
-
+        lines = cleaned_input.pop('lines')
+        
         checkout = Checkout.objects.create(**cleaned_input)
-    
+        checkout_lines = []
+        for line in lines:
+            checkout_lines.append(CheckoutLine(checkout_id=checkout.id, **line))
+        checkout_lines.bulk_create(checkout_lines)
         return CheckoutCreate(checkout=checkout)
