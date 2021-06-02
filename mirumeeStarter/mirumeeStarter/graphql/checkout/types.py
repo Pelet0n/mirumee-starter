@@ -30,6 +30,6 @@ class CheckoutLineType(DjangoObjectType):
         fields = '__all__'
 
     def resolve_total_price(self, __info):
-        total_price = self.objects.all()
+        total_price = self.checkout
         print(total_price)
         return total_price

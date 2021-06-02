@@ -1,9 +1,9 @@
 from django.db import models
 from ..product.models import ProductVariant
-from django.contrib.auth.models import User 
+from ..account.models import User
 
 class Checkout(models.Model):
-    user = models.ForeignKey(User, related_name="users", on_delete=models.PROTECT)
+    user = models.ForeignKey(User, related_name='user', on_delete=models.CASCADE)
     user_email = models.EmailField(null=False, blank=False)
 
 class CheckoutLine(models.Model):

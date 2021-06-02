@@ -38,3 +38,15 @@ class CheckoutCreate(graphene.Mutation):
             checkout_lines.append(CheckoutLine(checkout_id=checkout.id, **line))
         checkout_lines.bulk_create(checkout_lines)
         return CheckoutCreate(checkout=checkout)
+
+'''class CheckoutLineCreate(graphene.Mutation):
+    checkout_line = graphene.Field(CheckoutLineType)
+
+    class Arguments:
+        input = graphene.List(CheckoutLineCreateInput, required=True)
+        checkout_id = graphene.ID(required=True)
+
+    def mutate(cls, root, info, input, checkout_id):
+
+
+        return CheckoutLineCreate(checkout_line = checkout_line)'''
