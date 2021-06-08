@@ -2,6 +2,8 @@
 
 from tabnanny import check
 import graphene
+from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist
 from .types import CheckoutType, CheckoutLineType
 from ...checkout.models import Checkout, CheckoutLine
 
@@ -39,14 +41,32 @@ class CheckoutCreate(graphene.Mutation):
         checkout_lines.bulk_create(checkout_lines)
         return CheckoutCreate(checkout=checkout)
 
-'''class CheckoutLineCreate(graphene.Mutation):
+class CheckoutLineCreate(graphene.Mutation):
     checkout_line = graphene.Field(CheckoutLineType)
 
     class Arguments:
-        input = graphene.List(CheckoutLineCreateInput, required=True)
+        input = CheckoutLineCreateInput(required=True)
         checkout_id = graphene.ID(required=True)
 
+    @classmethod
     def mutate(cls, root, info, input, checkout_id):
 
+        variant_id = input.pop('variant_id')
+        input_quantity = input.pop('quantity')
 
-        return CheckoutLineCreate(checkout_line = checkout_line)'''
+        try:
+            checkout_line = CheckoutLine.objects.get(checkout_id=checkout_id, variant=variant_id)
+        except ObjectDoesNotExist():
+            checkout_line = CheckoutLine.objects.create(
+                checkout_id=checkout_id,
+                variant_id=variant_id,
+                quantity=input_quantity)
+
+            return CheckoutLineCreate(checkout_line=checkout_line)
+
+        quantity = checkout_line.quantity + input_quantity
+
+        checkout_line.quantity = quantity
+        checkout_line.save()
+
+        return CheckoutLineCreate(checkout_line=checkout_line)
