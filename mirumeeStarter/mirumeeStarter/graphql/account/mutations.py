@@ -16,9 +16,8 @@ class UserCreate(graphene.Mutation):
         input = UserCreateInput(required=True)
 
     @classmethod
-    @staff_member_required
     def mutate(cls, root, info, input):
-        user = User.objects.create(**input)
+        user = User.objects.create_user(**input)
 
         return UserCreate(user=user)
 
@@ -31,6 +30,6 @@ class StaffCreate(graphene.Mutation):
     @classmethod
     @superuser_required
     def mutate(cls, root, info, input):
-        user = User.objects.create(**input, is_staff=True)
+        user = User.objects.create_user(**input, is_staff=True)
 
         return StaffCreate(user=user)

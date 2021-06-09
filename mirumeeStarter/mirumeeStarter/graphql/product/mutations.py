@@ -1,5 +1,6 @@
 
 
+from django.core.exceptions import ObjectDoesNotExist
 import graphene
 from graphql_jwt.decorators import staff_member_required
 from .types import ProductType, ProductVariantType
@@ -18,7 +19,14 @@ class ProductCreate(graphene.Mutation):
         input = ProductCreateInput(required=True)
 
     @classmethod
+    def clean_price(self, price):
+        if int(price) < 0:
+            raise Exception("Cena produktu nie może być ujemna!")
+
+    @classmethod
     def clean_input(cls, input):
+        cls.clean_price(input['price'])
+
         return input
 
     @classmethod
@@ -42,7 +50,28 @@ class ProductVariantCreate(graphene.Mutation):
         product_id = graphene.ID(required=True)
 
     @classmethod
+    def clean_price(self, price):
+        if int(price) < 0:
+            raise Exception("Cena produktu nie może być ujemna!")
+
+    @classmethod
+    def clean_sku(self, sku):
+        if ProductVariant.objects.filter(sku=sku).exists():
+            raise Exception("Wariant produktu z takim sku już istnieje")
+
+    @classmethod
+    def clean_productId(self, productId):
+        if not ProductVariant.objects.filter(product_id = productId).exists():
+            raise Exception("Produkt o podanym id nie istnieje")
+            
+        
+
+    @classmethod
     def clean_input(cls, input):
+        cls.clean_sku(input['sku'])
+        cls.clean_price(input['price'])
+        #cls.clean_productId(product_id)
+
         return input
 
     @classmethod
