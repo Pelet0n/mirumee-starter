@@ -19,7 +19,7 @@ class ProductCreate(graphene.Mutation):
         input = ProductCreateInput(required=True)
 
     @classmethod
-    def clean_price(self, price):
+    def clean_price(cls, price):
         if int(price) < 0:
             raise Exception("Cena produktu nie może być ujemna!")
 
@@ -67,17 +67,17 @@ class ProductVariantCreate(graphene.Mutation):
         
 
     @classmethod
-    def clean_input(cls, input):
+    def clean_input(cls, input, product_id):
         cls.clean_sku(input['sku'])
         cls.clean_price(input['price'])
-        #cls.clean_productId(product_id)
+        cls.clean_productId(product_id)
 
         return input
 
     @classmethod
     @staff_member_required
     def mutate(cls, root, info, input, product_id):
-        cleaned_input = cls.clean_input(input)
+        cleaned_input = cls.clean_input(input, product_id)
         product_variant = ProductVariant.objects.create(product_id=product_id, **cleaned_input)
 
         return ProductVariantCreate(product_variant = product_variant)

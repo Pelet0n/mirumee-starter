@@ -6,6 +6,8 @@ from django.core.exceptions import ValidationError
 from django.core.exceptions import ObjectDoesNotExist
 from .types import CheckoutType, CheckoutLineType
 from ...checkout.models import Checkout, CheckoutLine
+from ...product.models import ProductVariant
+from ...account.models import User
 
 class CheckoutLineCreateInput(graphene.InputObjectType):
     variant_id = graphene.ID(required=True)
@@ -24,9 +26,26 @@ class CheckoutCreate(graphene.Mutation):
     class Arguments:
         input = CheckoutCreateInput(required=True)
         
+    @classmethod
+    def clean_variant_id(cls, variant_id):
+        if not ProductVariant.objects.filter(id=variant_id).exists():
+            raise Exception("The product variant with the given id does not exist")
+
+    @classmethod
+    def clean_quantity(cls, quantity):
+        if quantity < 0:
+            raise Exception("quantity cannot be less than 0")
+
+    def clean_user_id(cls, user_id):
+        if User.objects.filter(id=user_id).exists():
+            raise Exception("The user with the given id does not exist")
 
     @classmethod
     def clean_input(cls, input):
+        cls.clean_quantity(input['lines'][0].quantity)
+        cls.clean_variant_id(input['lines'][0].variant_id)
+        cls.clean_user_id(input['user_id'])
+
         return input
 
     @classmethod
@@ -49,7 +68,26 @@ class CheckoutLineCreate(graphene.Mutation):
         checkout_id = graphene.ID(required=True)
 
     @classmethod
+    def clean_variant_id(cls, variant_id):
+        if not ProductVariant.objects.filter(id=variant_id).exists():
+            raise Exception("The product variant with the given id does not exist")
+
+    @classmethod
+    def clean_quantity(cls, quantity):
+        if quantity < 0:
+            raise Exception("quantity cannot be less than 0")
+
+
+    @classmethod
+    def clean_input(cls, input):
+        cls.clean_variant_id(input['variant_id'])
+        cls.clean_quantity(input['quantity'])
+
+        return input
+    
+    @classmethod
     def mutate(cls, root, info, input, checkout_id):
+        cleaned_input = cls.clean_input(input)
 
         variant_id = input.pop('variant_id')
         input_quantity = input.pop('quantity')

@@ -1,11 +1,13 @@
 from ....product.models import Product
+import json
+from decimal import Decimal
 
 def test_product_by_id(db, client_query):
     product = Product.objects.create(
         name = "Test Product",
         description = "Product description",
-        price = 10,
-        quantity = 10
+        price = Decimal("10.00"),
+        quantity = 10.00
     )
 
     response = client_query(
@@ -19,6 +21,13 @@ def test_product_by_id(db, client_query):
         }
     }
         """,
-        op_name='product',
-        variables={id:product.id}
+        variables={'id':1}
     )
+    content = json.load(response.content)
+
+    product_response = content['data']['product']
+
+    assert product_response['id'] == str(product.id)
+    assert product_response['description'] == product.description
+    assert product_response['quantity'] == product.quantity
+    assert product_response['price'] == str(product.price) 
