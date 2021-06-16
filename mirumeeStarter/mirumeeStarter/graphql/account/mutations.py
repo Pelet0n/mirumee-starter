@@ -32,6 +32,8 @@ class UserCreate(graphene.Mutation):
     def clean_email(cls, email):
         if not re.search('^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$', email):
             raise Exception("enter a valid email address")
+        if User.objects.filter(email=email).exists():
+            raise Exception("This email is already taken")
 
     @classmethod
     def clean_input(cls, input):
@@ -68,6 +70,8 @@ class StaffCreate(graphene.Mutation):
     def clean_email(cls, email):
         if not re.search('^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$', email):
             raise Exception("enter a valid email address")
+        if User.objects.filter(email=email).exists():
+            raise Exception("This email is already taken")
 
     @classmethod
     def clean_input(cls, input):

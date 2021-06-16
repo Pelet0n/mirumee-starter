@@ -36,8 +36,9 @@ class CheckoutCreate(graphene.Mutation):
         if quantity < 0:
             raise Exception("quantity cannot be less than 0")
 
+    @classmethod
     def clean_user_id(cls, user_id):
-        if User.objects.filter(id=user_id).exists():
+        if not User.objects.filter(id=user_id).exists():
             raise Exception("The user with the given id does not exist")
 
     @classmethod

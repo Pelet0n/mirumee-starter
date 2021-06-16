@@ -17,7 +17,7 @@ class CheckoutQueries(graphene.ObjectType):
     )
     checkout_lines = graphene.List(CheckoutLineType)
 
-    def resolve_checkout(self, info, token):
+    def resolve_checkout(self, __info, id):
         checkout = Checkout.objects.filter(id=id).first()
         return checkout
 
