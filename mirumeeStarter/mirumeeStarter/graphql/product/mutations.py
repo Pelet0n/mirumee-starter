@@ -1,6 +1,7 @@
 
 
 import graphene
+from graphql_jwt.decorators import staff_member_required
 from .types import ProductType, ProductVariantType
 from ...product.models import Product, ProductVariant
 
@@ -21,6 +22,7 @@ class ProductCreate(graphene.Mutation):
         return input
 
     @classmethod
+    @staff_member_required
     def mutate(cls, root, info, input):
         cleaned_input = cls.clean_input(input)
         product = Product.objects.create(**cleaned_input)
@@ -44,6 +46,7 @@ class ProductVariantCreate(graphene.Mutation):
         return input
 
     @classmethod
+    @staff_member_required
     def mutate(cls, root, info, input, product_id):
         cleaned_input = cls.clean_input(input)
         product_variant = ProductVariant.objects.create(product_id=product_id, **cleaned_input)

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 
     'mirumeeStarter.product',
     'mirumeeStarter.checkout',
+    'mirumeeStarter.account',
     
 ]
 
@@ -131,5 +132,15 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 GRAPHENE = {
-    "SCHEMA": "mirumeeStarter.graphql.api.schema"
+    "SCHEMA": "mirumeeStarter.graphql.api.schema",
+    'MIDDLEWARE': [
+        'graphql_jwt.middleware.JSONWebTokenMiddleware',
+    ],
 }
+
+AUTHENTICATION_BACKENDS = [
+    'graphql_jwt.backends.JSONWebTokenBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AUTH_USER_MODEL = 'account.User'
