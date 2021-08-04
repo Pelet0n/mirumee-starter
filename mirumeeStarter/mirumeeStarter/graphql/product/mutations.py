@@ -30,7 +30,7 @@ class ProductCreate(graphene.Mutation):
         return input
 
     @classmethod
-    @staff_member_required
+    #@staff_member_required
     def mutate(cls, root, info, input):
         cleaned_input = cls.clean_input(input)
         product = Product.objects.create(**cleaned_input)
@@ -81,3 +81,38 @@ class ProductVariantCreate(graphene.Mutation):
         product_variant = ProductVariant.objects.create(product_id=product_id, **cleaned_input)
 
         return ProductVariantCreate(product_variant = product_variant)
+    
+class ProductUpdate(graphene.Mutation):
+    product = graphene.Field(ProductType)
+
+    class Arguments:
+        input = ProductCreateInput(required = True)
+        product_id = graphene.ID(required = True)
+
+    @classmethod
+    @staff_member_required
+    def mutate(cls, root, info, input, product_id):
+        product = Product.objects.filter(id=product_id).update(name=input['name'], price=input['price'], description=input['description'], quantity=input['quantity'])
+        breakpoint()
+        return ProductUpdate(product=product)
+
+
+class ProductDelete(graphene.Mutation):
+    product = graphene.Field(ProductType)
+
+    class Arguments:
+        product_id = graphene.ID(required=True)
+
+    @classmethod
+    def clean_id(cls, product_id):
+        if not Product.objects.filter(id=product_id).exists():
+            raise Exception('Product with given id does not exist')
+        return product_id
+
+    @classmethod
+    def mutate(cls, root, info, product_id):
+        product_id = cls.clean_id(product_id)
+        product = Product.objects.get(id=product_id)
+        product.delete()
+        
+        return ProductDelete(product=product)

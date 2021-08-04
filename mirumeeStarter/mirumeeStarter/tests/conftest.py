@@ -24,12 +24,8 @@ def products_query():
 
 @pytest.fixture
 def usermutation():
-    breakpoint()
     user = User.objects.create(
-        email = "test@test.com",
-        
-        firstName = "test",
-        lastName = "test",
+        email = "test123@test.com",
         password = "qwerty123456A$"
     )
     

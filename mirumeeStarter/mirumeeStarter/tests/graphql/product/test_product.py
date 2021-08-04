@@ -59,3 +59,21 @@ def test_products(db, client_query, products_query):
         assert item['description'] == products_query.description
         assert item['quantity'] == products_query.quantity
         assert item['price'] == str(products_query.price)
+
+def test_mutate_product(db, client_query, products_query):
+    response = client_query(
+        """
+        mutation{
+            productCreate(input:{name:"Test", price:"10.00", description:"test", quantity:1}){
+        product{
+        id,name,description
+                }
+            }
+        }
+        """
+    )
+
+    content = json.loads(response.content)
+    breakpoint()
+    product_response = content['data']['productCreate']['product']
+    assert product_response['id'] == str(products_query.id)
